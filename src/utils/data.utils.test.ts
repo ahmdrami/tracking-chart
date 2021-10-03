@@ -2,7 +2,7 @@ import { Transaction, TransactionSource } from '../models'
 import { FAILED_LEVELS, setTransactionLevel, sortTransactions, SUCCESS_LEVELS } from './data.utils'
 
 describe('data.utils', () => {
-  test('should verify transactions are sorted and grouped by date', () => {
+  test('should verify transactions are sorted and grouped by week and date', () => {
     const transactions: TransactionSource[] = [
       { transactionType: 'success', date: '2019-10-02', amount: 349.99 },
       { transactionType: 'success', date: '2019-10-05', amount: 349.99 },
@@ -13,7 +13,9 @@ describe('data.utils', () => {
     ]
     const sortedTransactions = sortTransactions(transactions)
 
-    Object.keys(sortedTransactions).forEach((key, index) => expect(key).toEqual(`2019-10-0${index + 1}`))
+    Object.keys(sortedTransactions).forEach((key) =>
+      Object.keys(sortedTransactions[key]).forEach((key, index) => expect(key).toEqual(`2019-10-0${index + 1}`))
+    )
   })
 
   test('should verify all transactions taken on 2019-10-02 to have a total of 6 failures', () => {
@@ -33,7 +35,7 @@ describe('data.utils', () => {
     ]
     const sortedTransactions = sortTransactions(transactions)
 
-    expect(sortedTransactions['2019-10-02'].failed).toEqual(6)
+    expect(sortedTransactions[40]['2019-10-02'].failed).toEqual(6)
   })
 
   describe('setTransactionLevel', () => {
@@ -43,6 +45,7 @@ describe('data.utils', () => {
         { success: 19, failed: 8, date: 'any', day: 0 },
         { success: 29, failed: 8, date: 'any', day: 0 },
         { success: 31, failed: 8, date: 'any', day: 0 },
+        { success: 41, failed: 8, date: 'any', day: 0 },
       ]
 
       transactions.forEach((transaction, index) => expect(setTransactionLevel(transaction)).toEqual(SUCCESS_LEVELS[index]))
@@ -53,7 +56,8 @@ describe('data.utils', () => {
         { success: 4, failed: 9, date: 'any', day: 0 },
         { success: 19, failed: 20, date: 'any', day: 0 },
         { success: 29, failed: 30, date: 'any', day: 0 },
-        { success: 31, failed: 41, date: 'any', day: 0 },
+        { success: 31, failed: 40, date: 'any', day: 0 },
+        { success: 31, failed: 51, date: 'any', day: 0 },
       ]
 
       transactions.forEach((transaction, index) => expect(setTransactionLevel(transaction)).toEqual(FAILED_LEVELS[index]))

@@ -14,4 +14,4 @@ export type Transaction = {
   day: number
 }
 
-export type GroupedTransaction = Record<string, Transaction>
+export type GroupedTransaction = Record<string, Record<string, Transaction>>

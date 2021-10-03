@@ -108,5 +108,8 @@ export const theme: Theme = {
     img: {
       maxWidth: '100%',
     },
+    small: {
+      fontSize: 0,
+    },
   },
 }

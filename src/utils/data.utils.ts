@@ -1,14 +1,14 @@
 import { TransactionSource, Transaction, GroupedTransaction, TransactionStatus } from '../models'
+import { getWeek } from 'date-fns'
 
-export const SUCCESS_LEVELS = ['#EF9A9A', '#EF5350', '#E53935', '#C62828']
-export const FAILED_LEVELS = ['#4DB6AC', '#009688', '#00897B', '#00695C']
+export const FAILED_LEVELS = ['#FFEBEE', '#EF9A9A', '#EF5350', '#E53935', '#B71C1C']
+export const SUCCESS_LEVELS = ['#E0F2F1', '#80CBC4', '#26A69A', '#00897B', '#004D40']
 export const BLANK_COLOR = '#BDBDBD'
 
 /**
  * sort items by date
- * group by date
- * store total failures and success for each date
- * determine level
+ * group by week and  date e.g. { [week-number][date] = { values } }
+ * store total failures and success for each date then assign a level
  *
  */
 export const sortTransactions = (transactions: TransactionSource[]): GroupedTransaction => {
@@ -17,32 +17,45 @@ export const sortTransactions = (transactions: TransactionSource[]): GroupedTran
   const groupedTransactions = data
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
     .reduce((groupedByDateTransac: GroupedTransaction, transc) => {
-      // set previous date to current transaction if undefined, this is used at later stage to determine either the success or fialure level
+      const weekNumber = getWeek(new Date(transc.date))
+
+      // create week if undefined
+      if (!groupedByDateTransac[weekNumber]) {
+        groupedByDateTransac[weekNumber] = {}
+      }
+
+      // create date under its week if undefined
+      if (!groupedByDateTransac[weekNumber][transc.date]) {
+        groupedByDateTransac[weekNumber][transc.date] = { failed: 0, success: 0, date: transc.date, day: new Date(transc.date).getDay() }
+      }
+
+      // set previous date to current transaction if undefined
+      // this is used at later stage to determine the hex colour
       if (!prevDate) {
         prevDate = transc.date
       }
-      if (!groupedByDateTransac[transc.date]) {
-        groupedByDateTransac[transc.date] = { failed: 0, success: 0, date: transc.date, day: new Date(transc.date).getDay() }
-      }
+
+      // increment failures
       if (transc.transactionType === 'failed') {
-        groupedByDateTransac[transc.date].failed = groupedByDateTransac[transc.date].failed + 1
+        groupedByDateTransac[weekNumber][transc.date].failed += 1
       }
 
+      // increment success
       if (transc.transactionType === 'success') {
-        groupedByDateTransac[transc.date].success = groupedByDateTransac[transc.date].success + 1
+        groupedByDateTransac[weekNumber][transc.date].success += 1
       }
 
       // update prev transaction level only when the next transaction date is different to avoid updating in every iteration
       // set prevDate to the current transaction date after the update
       if (prevDate !== transc.date) {
-        groupedByDateTransac[prevDate].level = setTransactionLevel(groupedByDateTransac[prevDate])
+        const prevWeek = getWeek(new Date(prevDate))
+        groupedByDateTransac[prevWeek][prevDate].level = setTransactionLevel(groupedByDateTransac[prevWeek][prevDate])
         prevDate = transc.date
       }
 
       return groupedByDateTransac
     }, {})
 
-  // Object.keys(groupedTransactions).forEach((key) => console.log(key, groupedTransactions[key].failed, groupedTransactions[key].success))
   return groupedTransactions
 }
 
@@ -66,5 +79,8 @@ export const getLevelColour = (rate: number, type: TransactionStatus): string =>
   if (rate > 20 && rate <= 30) {
     return type === 'success' ? SUCCESS_LEVELS[2] : FAILED_LEVELS[2]
   }
-  return type === 'success' ? SUCCESS_LEVELS[3] : FAILED_LEVELS[3]
+  if (rate > 30 && rate <= 40) {
+    return type === 'success' ? SUCCESS_LEVELS[3] : FAILED_LEVELS[3]
+  }
+  return type === 'success' ? SUCCESS_LEVELS[4] : FAILED_LEVELS[4]
 }
