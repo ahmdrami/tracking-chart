@@ -63,10 +63,10 @@ describe('data.utils', () => {
       transactions.forEach((transaction, index) => expect(setTransactionLevel(transaction)).toEqual(FAILED_LEVELS[index]))
     })
 
-    test('should return #FF7043 hex color when success and failures matches', () => {
+    test('should return #B3E5FC hex color when success and failures matches', () => {
       const transactions: Transaction[] = [{ success: 4, failed: 4, date: 'any', day: 0 }]
 
-      transactions.forEach((transaction, index) => expect(setTransactionLevel(transaction)).toEqual('#FF7043'))
+      transactions.forEach((transaction, index) => expect(setTransactionLevel(transaction)).toEqual('#B3E5FC'))
     })
   })
 })

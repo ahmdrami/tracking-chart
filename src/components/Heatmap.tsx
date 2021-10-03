@@ -4,7 +4,7 @@ import { Flex } from 'theme-ui'
 import { GroupedTransaction } from '../models'
 import { Levels } from './Levels'
 import { Weeks } from './Weeks'
-// const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+import { Months } from './Months'
 
 interface Props {
   transactions: GroupedTransaction
@@ -13,6 +13,9 @@ interface Props {
 export const Heatmap: FC<Props> = ({ transactions }): JSX.Element => {
   return (
     <Flex sx={{ mx: 'auto', mt: 4, maxWidth: 800, flexDirection: 'column' }}>
+      <Flex sx={{ ml: 'auto', width: '100%' }}>
+        <Months />
+      </Flex>
       <Flex sx={{ width: '100%' }}>
         <Weeks />
         <svg sx={{ width: '100%' }} viewBox="0 0 800 150">

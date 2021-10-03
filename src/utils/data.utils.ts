@@ -3,7 +3,7 @@ import { getWeek } from 'date-fns'
 
 export const FAILED_LEVELS = ['#FFEBEE', '#EF9A9A', '#EF5350', '#E53935', '#B71C1C']
 export const SUCCESS_LEVELS = ['#E0F2F1', '#80CBC4', '#26A69A', '#00897B', '#004D40']
-export const BLANK_COLOR = '#BDBDBD'
+export const SIMILAR_LEVELS = ['#B3E5FC']
 
 /**
  * sort items by date
@@ -60,12 +60,13 @@ export const sortTransactions = (transactions: TransactionSource[]): GroupedTran
 }
 
 export const setTransactionLevel = (transaction: Transaction): string => {
+  if (transaction.success === transaction.failed) {
+    return SIMILAR_LEVELS[0]
+  }
   if (transaction.success > transaction.failed) {
     return getLevelColour(transaction.success, 'success')
   }
-  if (transaction.success === transaction.failed) {
-    return '#FF7043'
-  }
+
   return getLevelColour(transaction.failed, 'failed')
 }
 
